@@ -7,10 +7,33 @@ const width = canvas.width = window.innerWidth;
 const height = canvas.height = window.innerHeight;
 
 // Boolean states for extra effects
-/*
+// Collision causes the balls to bounce away from the object
 let collision = false;
+// Dominant sets the larger ball's color to the smaller. 
 let dominant = false;
-*/
+// Getting the collision button to work.
+const colbtn = document.getElementById("collisionBut");
+colbtn.addEventListener('click', () => {
+  collision = !collision;
+  if(collision) {
+    colbtn.value = "Collision: on";
+  }
+  else {
+    colbtn.value = 'Collision: off';
+  }
+} );
+
+//Getting the dominant button to work. When click sets boolean to opposite and changes button text
+const domBtn = document.getElementById('dominatBut');
+domBtn.addEventListener('click', () => {
+  dominant = !dominant;
+  if(dominant){
+    domBtn.value = 'Dominant: on';
+  }
+  else {
+    domBtn.value = 'Dominant: off';
+  }
+} );
 // function to generate random number
 
 function random(min, max) {
@@ -25,15 +48,13 @@ function randomRGB() {
 }
 
 class Ball {
-  constructor(x, y, velX, velY, color, size){
-    this.x = x; 
+  constructor(x, y, velX, velY, color, size) {
+    this.x = x;
     this.y = y;
     this.velX = velX;
     this.velY = velY;
     this.color = color;
     this.size = size;
-    // This will help with collision
-    //this.slope = velY/velX;
   }
 
   draw() {
@@ -43,55 +64,52 @@ class Ball {
     ctx.fill();
   }
 
-  update(){
-    if((this.x + this.size) >= width) {
+  update() {
+    if ((this.x + this.size) >= width) {
       this.velX = -(this.velX);
     }
-    if((this.x - this.size) <= 0) {
+    if ((this.x - this.size) <= 0) {
       this.velX = -(this.velX);
     }
-    if((this.y + this.size) >= height) {
+    if ((this.y + this.size) >= height) {
       this.velY = -(this.velY);
     }
-    if((this.y - this.size) <= 0) {
+    if ((this.y - this.size) <= 0) {
       this.velY = -(this.velY);
     }
 
     this.x += this.velX;
     this.y += this.velY;
   }
-  collisionDetect(){
-    for(const ball of balls){
-      if(this !== ball){
+  collisionDetect() {
+    for (const ball of balls) {
+      if (this !== ball) {
         const dx = this.x - ball.x;
         const dy = this.y - ball.y;
-        const dinstance = Math.sqrt(dx*dx + dy*dy);
-
-        if(distance < this.size + ball.size){
-          /*
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        //If the two balls are touching
+        if (distance < this.size + ball.size) {
           if(dominant){
-            if(this.size > ball.size){
+            if(this.size >= ball.size){
               ball.color = this.color;
             }
-            else {
-              this.color = ball.color;
-            }
+            else
+                this.color = ball.color;
           }
           else {
-            */
           ball.color = this.color = randomRGB();
-          }/*
-          if(collision){
-            if(dx < dy){
-              this.x = -(this.x);
-            }
-            else {
-              this.y = -(this.y);
-            }
-            */
           }
+          //If collision is on
+          if(collision){
+            if(dx > dy)
+              this.velX = -(this.velX);
+            else
+              this.velY = -(this.velY);
+          }
+        }
       }
     }
+  }
 }  // End of Ball
 
 const balls = [];
@@ -112,15 +130,16 @@ while (balls.length < 25) {
   balls.push(ball);
 }
 
-function loop(){
-  ctx.fillStyle = 'rgb(0, 0, 0, 0.25)';
+function loop() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
   ctx.fillRect(0, 0, width, height);
 
-  for(const ball of balls){
+  for (const ball of balls) {
     ball.draw();
     ball.update();
     ball.collisionDetect();
   }
+
   requestAnimationFrame(loop);
 }
 
