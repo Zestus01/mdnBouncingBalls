@@ -11,6 +11,8 @@ const height = canvas.height = window.innerHeight;
 let collision = false;
 // Dominant sets the larger ball's color to the smaller. 
 let dominant = false;
+//When true teleports the ball to the opposite edge of the screen
+let tele = false;
 // Getting the collision button to work.
 const colbtn = document.getElementById("collisionBut");
 colbtn.addEventListener('click', () => {
@@ -34,8 +36,20 @@ domBtn.addEventListener('click', () => {
     domBtn.value = 'Dominant: off';
   }
 } );
-// function to generate random number
 
+const teleBtn = document.getElementById('teleport');
+teleBtn.addEventListener('click', () => {
+  tele = !tele;
+  if(tele){
+    teleBtn.value = 'Teleport: on';
+  }
+  else {
+    teleBtn.value = 'Teleport: off';
+  }
+} );
+
+
+// function to generate random number
 function random(min, max) {
   const num = Math.floor(Math.random() * (max - min + 1)) + min;
   return num;
@@ -65,17 +79,34 @@ class Ball {
   }
 
   update() {
-    if ((this.x + this.size) >= width) {
-      this.velX = -(this.velX);
-    }
-    if ((this.x - this.size) <= 0) {
-      this.velX = -(this.velX);
-    }
-    if ((this.y + this.size) >= height) {
-      this.velY = -(this.velY);
-    }
-    if ((this.y - this.size) <= 0) {
-      this.velY = -(this.velY);
+    //The balls kept getting stuck on the right hand edge. this.size * 1.2 keeps the ball well away fro the edge.
+    if(tele){
+      if ((this.x + this.size) >= width) {
+        this.x = (0 + (this.size * 1.3));
+      }
+      if ((this.x - this.size) <= 0) {
+        this.x = (width - (this.size * 1.2));
+      }
+      if ((this.y + this.size) >= height) {
+        this.y = (0 + (this.size * 1.2));
+      }
+      if ((this.y + this.size) <= 0) {
+        this.y = (height - (this.size * 1.2));
+      }
+
+    } else {
+      if ((this.x + this.size) >= width) {
+        this.velX = -(this.velX);
+      }
+      if ((this.x - this.size) <= 0) {
+        this.velX = -(this.velX);
+      }
+      if ((this.y + this.size) >= height) {
+        this.velY = -(this.velY);
+      }
+      if ((this.y - this.size) <= 0) {
+        this.velY = -(this.velY);
+      }
     }
 
     this.x += this.velX;
